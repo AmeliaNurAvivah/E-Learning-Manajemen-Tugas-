@@ -1,0 +1,16 @@
+# flask_app/__init__.py
+
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app.secret_key = "replace-with-secret"
+
+    # register routes
+    
+    from ..task_manage.interface.flask.routes import tugas_bp
+    
+
+    app.register_blueprint(tugas_bp)
+
+    return app

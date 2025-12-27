@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+<h2>Pengumpulan Tugas</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Mahasiswa</th>
+      <th>Waktu Kumpul</th>
+      <th>File</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in pengumpulan_list %}
+    <tr>
+      <td>{{ p.mahasiswa_nama }}</td>
+      <td>{{ p.waktu_kumpul }}</td>
+      <td>
+        <a href="{{ url_for('static', filename=p.file_path|replace('interface/flask/static/', '') ) }}" target="_blank">
+          Unduh
+        </a>
+      </td>
+      <td>
+        {% if p.terlambat %}
+          <span class="badge-danger">Terlambat</span>
+        {% else %}
+          <span class="badge-success">Tepat Waktu</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

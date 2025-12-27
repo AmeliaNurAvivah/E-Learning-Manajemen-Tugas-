@@ -1,0 +1,31 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+<h2>Daftar Tugas</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Judul</th>
+      <th>Mata Kuliah</th>
+      <th>Deadline</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tugas_list %}
+    <tr>
+      <td>{{ t.judul }}</td>
+      <td>{{ t.matakuliah_nama }}</td>
+      <td>{{ t.deadline }}</td>
+      <td>
+        <a href="{{ url_for('tugas.lihat_pengumpulan', tugas_id=t.id) }}">
+          Lihat Pengumpulan
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
