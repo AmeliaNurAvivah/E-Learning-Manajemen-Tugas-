@@ -1,5 +1,5 @@
 import uuid
-from katalog.domain.services import IdGeneratorService
+from domain.services import IdGeneratorService
 
 class UuidGeneratorService(IdGeneratorService):
     def generate_id(self) -> str:

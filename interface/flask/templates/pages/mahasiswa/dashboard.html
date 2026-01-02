@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Mahasiswa</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <h2>🎓 Dashboard Mahasiswa</h2>
+    <nav>
+        <a href="/mahasiswa">Dashboard</a>
+        <a href="/dosen">Mode Dosen</a>
+    </nav>
+</header>
+
+<div class="container">
+{% for t in tugas %}
+<div class="card">
+    <h3>{{ t.judul }}</h3>
+    <p>{{ t.deskripsi }}</p>
+    <p>Deadline: {{ t.deadline }}</p>
+
+    {% if now <= t.deadline %}
+        <form method="POST" action="/kumpul/{{ t.id }}" enctype="multipart/form-data">
+            <input name="nama" placeholder="Nama Mahasiswa" required>
+            <input type="file" name="file" required>
+            <button>Kumpulkan</button>
+        </form>
+    {% else %}
+        <span class="badge badge-expired">Deadline Terlewati</span>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
+
+</body>
+</html>

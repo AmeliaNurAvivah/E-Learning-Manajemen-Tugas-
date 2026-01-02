@@ -8,7 +8,7 @@ def create_app():
 
     # register routes
     
-    from ..task_manage.interface.flask.routes import tugas_bp
+    from interface.flask.routes import tugas_bp
     
 
     app.register_blueprint(tugas_bp)

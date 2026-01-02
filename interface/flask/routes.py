@@ -1,71 +1,101 @@
-from flask import Blueprint, render_template, request,session, redirect, url_for, flash
-from task_manage.application.tugas_use_case import TugasUseCase
-from task_manage.infrastructure.services.repositories_impl import (TugasRepositorySQLite ,
-                                                                   PengumpulanTugasRepositorySQLite)
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import send_from_directory
+from application.tugas_use_case import TugasUseCase
+from application.pengumpulan_tugas_use_case import PengumpulanTugasUseCase
+from infrastructure.services.repositories_impl import (
+    TugasRepositoriesImpl,
+    PengumpulanTugasRepositoriesImpl
+)
 from datetime import datetime
-import os
 
-tugas_bp = Blueprint("tugas", __name__, url_prefix="/tugas")
+tugas_bp = Blueprint("tugas", __name__)
 
-tugas_uc = TugasUseCase
+tugas_uc = TugasUseCase(TugasRepositoriesImpl())
+pengumpulan_uc = PengumpulanTugasUseCase(
+    TugasRepositoriesImpl(),
+    PengumpulanTugasRepositoriesImpl()
+)
 
-
-UPLOAD_FOLDER = "flask_app/static/uploads"
 
 @tugas_bp.route("/")
-def dashboard_tugas():
-    """
-    Dashboard utama manajemen tugas
-    Ditampilkan saat pertama kali masuk ke modul tugas
-    """
+def dashboard():
+    tugas = tugas_uc.lihat_semua_tugas()
+    return render_template("pages/dosen/dashboard.html", tugas=tugas, now=datetime.now())
 
-    role = session.get("role")  # 'dosen' / 'mahasiswa'
 
-    if role == "dosen":
-        tugas_list = tugas_uc.list_tugas_dosen(session.get("user_id"))
-    elif role == "mahasiswa":
-        tugas_list = tugas_uc.list_tugas_mahasiswa(session.get("user_id"))
-    else:
-        tugas_list = []
+@tugas_bp.route("/tambah", methods=["GET", "POST"])
+def tambah():
+    if request.method == "POST":
+        tugas_uc.tambah_tugas(
+            request.form["judul"],
+            request.form["deskripsi"],
+            datetime.fromisoformat(request.form["deadline"])
+        )
+        return redirect(url_for("tugas.dashboard"))
+    return render_template("pages/tambah_tugas.html")
 
+
+@tugas_bp.route("/kumpul/<tugas_id>", methods=["POST"])
+def kumpul(tugas_id):
+    try:
+        pengumpulan_uc.kumpulkan_tugas(
+            tugas_id,
+            request.form["nama"],
+            request.files["file"]
+        )
+        flash("Tugas berhasil dikumpulkan")
+    except ValueError as e:
+        flash(str(e))
+    return redirect(url_for("tugas.dashboard"))
+
+@tugas_bp.route("/uploads/<filename>")
+def download_file(filename):
+    return send_from_directory("uploads", filename)
+
+@tugas_bp.route("/tugas/<tugas_id>")
+def detail_tugas(tugas_id):
+    tugas = tugas_uc.detail_tugas(tugas_id)
+    pengumpulan = pengumpulan_uc.lihat_pengumpulan(tugas_id)
     return render_template(
-        "pages/dashboard.html",
-        tugas_list=tugas_list,
-        role=role
+        "pages/detail_tugas.html",
+        tugas=tugas,
+        pengumpulan=pengumpulan
+    )
+
+@tugas_bp.route("/dosen")
+def dosen_dashboard():
+    return render_template(
+        "pages/dosen/dashboard.html",
+        tugas=tugas_uc.lihat_semua_tugas()
     )
 
 
-@tugas_bp.route("/dosen/tugas/tambah", methods=["GET", "POST"])
-def tambah_tugas():
+@tugas_bp.route("/dosen/tambah", methods=["GET","POST"])
+def dosen_tambah():
     if request.method == "POST":
         tugas_uc.tambah_tugas(
-            judul=request.form["judul"],
-            deskripsi=request.form["deskripsi"],
-            matakuliah_id=request.form["matakuliah_id"],
-            dosen_id=request.form["dosen_id"],
-            deadline=datetime.fromisoformat(request.form["deadline"])
+            request.form["judul"],
+            request.form["deskripsi"],
+            datetime.fromisoformat(request.form["deadline"])
         )
-        return redirect(url_for("tugas.daftar_tugas_dosen"))
+        return redirect("/dosen")
+    return render_template("pages/dosen/tambah_tugas.html")
 
-    return render_template("dosen/tambah_tugas.html")
 
-@tugas_bp.route("/mahasiswa/tugas/<int:tugas_id>/kumpul", methods=["POST"])
-def kumpul_tugas(tugas_id):
-    file = request.files["file"]
-    mahasiswa_id = request.form["mahasiswa_id"]
+@tugas_bp.route("/dosen/tugas/<tugas_id>")
+def dosen_detail(tugas_id):
+    return render_template(
+        "pages/dosen/detail_tugas.html",
+        tugas=tugas_uc.detail_tugas(tugas_id),
+        pengumpulan=pengumpulan_uc.lihat_pengumpulan(tugas_id)
+    )
 
-    filename = file.filename
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
 
-    try:
-        tugas_uc.kumpulkan_tugas(
-            tugas_id=tugas_id,
-            mahasiswa_id=mahasiswa_id,
-            file_path=filepath
-        )
-    except ValueError as e:
-        flash(str(e))
-        return redirect(request.referrer)
+@tugas_bp.route("/mahasiswa")
+def mahasiswa_dashboard():
+    return render_template(
+        "pages/mahasiswa/dashboard.html",
+        tugas=tugas_uc.lihat_semua_tugas(),
+        now=datetime.now()
+    )
 
-    return redirect(url_for("tugas.daftar_tugas_mahasiswa"))

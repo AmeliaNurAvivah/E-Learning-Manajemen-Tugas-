@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah Tugas</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <h2>➕ Tambah Tugas</h2>
+    <nav>
+        <a href="/dosen">Kembali</a>
+    </nav>
+</header>
+
+<div class="container">
+<form method="POST">
+    <label>Judul</label>
+    <input name="judul" required>
+
+    <label>Deskripsi</label>
+    <textarea name="deskripsi"></textarea>
+
+    <label>Deadline</label>
+    <input type="datetime-local" name="deadline" required>
+
+    <button>Simpan</button>
+</form>
+</div>
+
+</body>
+</html>

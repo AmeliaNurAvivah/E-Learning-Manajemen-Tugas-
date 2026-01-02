@@ -1,4 +1,4 @@
-from .repositories import DosenRepository, MatakuliahRepository, KelasRepository
+from domain.repositories.repositories import TugasRepository, PengumpulanRepository
 
 
-__all__ = ["DosenRepository", "MatakuliahRepository", "KelasRepository"]
+__all__ = ["TugasRepository", "PengumpulanRepository"]

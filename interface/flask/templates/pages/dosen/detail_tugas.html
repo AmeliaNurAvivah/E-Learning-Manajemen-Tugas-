@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detail Tugas</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <h2>📄 {{ tugas.judul }}</h2>
+    <nav>
+        <a href="/dosen">Kembali</a>
+    </nav>
+</header>
+
+<div class="container">
+<table>
+<tr>
+    <th>Mahasiswa</th>
+    <th>Waktu</th>
+    <th>File</th>
+</tr>
+
+{% for p in pengumpulan %}
+<tr>
+    <td>{{ p.nama_mahasiswa }}</td>
+    <td>{{ p.waktu_kumpul }}</td>
+    <td><a href="/uploads/{{ p.nama_file }}">Download</a></td>
+</tr>
+{% else %}
+<tr><td colspan="3">Belum ada pengumpulan</td></tr>
+{% endfor %}
+</table>
+</div>
+
+</body>
+</html>

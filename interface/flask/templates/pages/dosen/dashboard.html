@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Dosen</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <h2>📘 Dashboard Dosen</h2>
+    <nav>
+        <a href="/dosen">Dashboard</a>
+        <a href="/dosen/tambah">Tambah Tugas</a>
+        <a href="/mahasiswa">Mode Mahasiswa</a>
+    </nav>
+</header>
+
+<div class="container">
+{% for t in tugas %}
+<div class="card">
+    <h3>{{ t.judul }}</h3>
+    <p>{{ t.deskripsi }}</p>
+    <p>Deadline: {{ t.deadline }}</p>
+    <a href="/dosen/tugas/{{ t.id }}">📄 Lihat Pengumpulan</a>
+</div>
+{% else %}
+<p>Belum ada tugas.</p>
+{% endfor %}
+</div>
+
+</body>
+</html>
